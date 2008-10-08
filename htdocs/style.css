@@ -1,0 +1,73 @@
+body {
+  background-color: #def
+}
+
+body, td, div, li, p, span {
+  font-family: tahoma, verdana, arial, sans-serif;
+  font-size: 12px;
+}
+
+div#form-holder {
+  text-align: center
+}
+
+input#analyze-code-button {
+  width: 200px;
+  padding: 5px;
+}
+
+div#loading {
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold
+}
+
+table {
+  border-left: solid #aaa 1px
+}
+
+td, th {
+  border-right: solid #aaa 1px
+}
+
+td {
+  padding: 0 3px
+}
+
+td.token {
+  text-align: center;
+  font-weight: bold
+}
+
+tr.enabled {
+  background-color: #bfb
+}
+
+th {
+  padding: 0 15px
+}
+
+tr.disabled {
+  background-color: #fbb
+}
+
+th.filter {
+  text-decoration: underline;
+  cursor: pointer;
+  cursor: hand;
+}
+
+th.is-filtering {
+  color: blue;
+}
+
+div#footer {
+  text-align: center;
+  font-size: 10px;
+  color: #555;
+  font-style: oblique
+}
+
+span.ignore-code-holder {
+  font-family: monospace
+}

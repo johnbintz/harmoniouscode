@@ -1,0 +1,3 @@
+-main CommandLineInterface
+-neko ../neko/codeparser.n
+-cp ../src

@@ -1,0 +1,8 @@
+To build Harmonious Code:
+
+* Make sure you're running haXe 2
+* Download the PHP documentation from CVS
+* Copy/symlink the phpdoc/phpbook/phpbook-xsl/version.xml file from the 
+  PHP documentationinto the data directory
+* Run test.sh. This will take a while as functions_tokens_cache.hxd is
+  built in the data directory.
