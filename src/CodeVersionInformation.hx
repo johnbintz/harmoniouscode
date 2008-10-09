@@ -106,27 +106,24 @@ class CodeVersionInformation {
     var version_lists = new Hash<Array<String>>();
     var version_match = ~/^([^\ ]+) (.*)$/;
     for (part in s.split(", ")) {
-      if (version_match.match(part)) {
-        var source = version_match.matched(1);
-        if (!version_lists.exists(source)) {
-          version_lists.set(source, new Array<String>());
-        }
-        var tmp = version_lists.get(source);
-        tmp.push(version_match.matched(2));
-        version_lists.set(source, tmp);
+      var parts = breakdown_php_version_string(part);
+      var source = parts[0];
+      if (!version_lists.exists(source)) {
+        version_lists.set(source, new Array<String>());
       }
+      var tmp = version_lists.get(source);
+      tmp.push(parts[1]);
+      version_lists.set(source, tmp);
     }
 
     var final_versions = new Hash<String>();
     for (source in version_lists.keys()) {
-      var tmp = version_lists.get(source);
-      tmp.sort(CodeVersionInformation.version_compare);
-      final_versions.set(source, tmp.join(", "));
+      final_versions.set(source, CodeVersionInformation.get_lowest_version(version_lists.get(source)));
     }
     return final_versions;
   }
 
-  public function new(results : Array<Result>) {
+  public function new(results : Array<Result>, ?ignored_modules : Hash<Bool>) {
     var start_minimum_versions = new Hash<Array<String>>();
     var start_maximum_versions = new Hash<Array<String>>();
 
@@ -140,22 +137,29 @@ class CodeVersionInformation {
           if (version_string_info.length > 0) {
             var source = version_string_info[0];
 
-            if (!internal_minimum_version.exists(source)) {
-              internal_minimum_version.set(source, new Array<String>());
+            var ok_to_use = true;
+            if (ignored_modules != null) {
+              ok_to_use = !ignored_modules.exists(source);
             }
-            var version_info = internal_minimum_version.get(source);
-            version_info.push(version_string_info[1]);
-            internal_minimum_version.set(source, version_info);
 
-            var is_lower_than = get_version_lower_than(part);
-            if (is_lower_than != null) {
-              if (!internal_maximum_version.exists(source)) {
-                internal_maximum_version.set(source, new Array<String>());
+            if (ok_to_use) {
+              if (!internal_minimum_version.exists(source)) {
+                internal_minimum_version.set(source, new Array<String>());
               }
+              var version_info = internal_minimum_version.get(source);
+              version_info.push(version_string_info[1]);
+              internal_minimum_version.set(source, version_info);
 
-              var versions = internal_maximum_version.get(source);
-              versions.push(is_lower_than);
-              internal_maximum_version.set(source, versions);
+              var is_lower_than = get_version_lower_than(part);
+              if (is_lower_than != null) {
+                if (!internal_maximum_version.exists(source)) {
+                  internal_maximum_version.set(source, new Array<String>());
+                }
+
+                var versions = internal_maximum_version.get(source);
+                versions.push(is_lower_than);
+                internal_maximum_version.set(source, versions);
+              }
             }
           }
         }

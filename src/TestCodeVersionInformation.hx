@@ -70,8 +70,8 @@ class TestCodeVersionInformation extends haxe.unit.TestCase {
 
   function testGetVersionStringSplit() {
     assertEquals("{xmlwriter => 2.0.4, PHP => 4}", CodeVersionInformation.split_version_string("PHP 4, xmlwriter 2.0.4").toString());
-    assertEquals("{xmlwriter => 2.0.4, PHP => 4 &gt;= 4.0.3}", CodeVersionInformation.split_version_string("PHP 4 &gt;= 4.0.3, xmlwriter 2.0.4").toString());
-    assertEquals("{PHP => 4, 5}", CodeVersionInformation.split_version_string("PHP 5, PHP 4").toString());
+    assertEquals("{xmlwriter => 2.0.4, PHP => 4.0.3}", CodeVersionInformation.split_version_string("PHP 4 &gt;= 4.0.3, xmlwriter 2.0.4").toString());
+    assertEquals("{PHP => 4}", CodeVersionInformation.split_version_string("PHP 5, PHP 4").toString());
   }
 
   function testGetModuleInformation() {
@@ -82,5 +82,18 @@ class TestCodeVersionInformation extends haxe.unit.TestCase {
     var v = new CodeVersionInformation(valid_results);
 
     assertEquals("[PHP, xmod, zmod]", v.all_modules.toString());
+  }
+
+  function testIgnoreModules() {
+    var valid_results = [
+      new Result(ResultType.Function, "one", "PHP 4, zmod 5"),
+      new Result(ResultType.Function, "two", "PHP 4 &gt;= 4.0.6, xmod 5"),
+      new Result(ResultType.Function, "three", "zmod 5"),
+    ];
+    var ignored_modules = new Hash<Bool>();
+    ignored_modules.set("xmod", true);
+    var v = new CodeVersionInformation(valid_results, ignored_modules);
+
+    assertEquals("[PHP, zmod]", v.all_modules.toString());
   }
 }

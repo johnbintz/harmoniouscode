@@ -1,8 +1,10 @@
 class CodeParser {
-  public var tokenProcessors(getTokenProcessors, null) : Hash<TokenProcessor>;
+  public var token_processors(get_token_processors, null) : Hash<TokenProcessor>;
+  public var ignored_modules(get_ignored_modules, null) : Hash<Bool>;
 
   public function new() {
-    this.tokenProcessors = new Hash<TokenProcessor>();
+    this.token_processors = new Hash<TokenProcessor>();
+    this.ignored_modules  = new Hash<Bool>();
   }
 
   #if neko
@@ -13,7 +15,7 @@ class CodeParser {
         functionProcessor.save_to_cache();
       }
 
-      this.tokenProcessors.set(Type.getClassName(Type.getClass(functionProcessor)), functionProcessor);
+      this.token_processors.set(Type.getClassName(Type.getClass(functionProcessor)), functionProcessor);
     }
   #end
 
@@ -21,10 +23,11 @@ class CodeParser {
     var functionProcessor = new FunctionTokenProcessor();
     functionProcessor.load_from_resource();
 
-    this.tokenProcessors.set(Type.getClassName(Type.getClass(functionProcessor)), functionProcessor);
+    this.token_processors.set(Type.getClassName(Type.getClass(functionProcessor)), functionProcessor);
   }
 
-  public function getTokenProcessors() { return this.tokenProcessors; }
+  public function get_token_processors() { return this.token_processors; }
+  public function get_ignored_modules() { return this.ignored_modules; }
 
   private function flatten_tokens_to_ignore(tokens_to_ignore : Array<Hash<Bool>>) : Hash<Bool> {
     var flattened_tokens = new Hash<Bool>();
@@ -38,8 +41,9 @@ class CodeParser {
 
   public function parse(s : String) : Array<Result> {
     var results = new Array<Result>();
+    this.ignored_modules = new Hash<Bool>();
 
-    var function_token_processor = this.tokenProcessors.get("FunctionTokenProcessor");
+    var function_token_processor = this.token_processors.get("FunctionTokenProcessor");
 
     var function_tokens_found = new Hash<Bool>();
     var tokens_to_ignore = new Array<Hash<Bool>>();
@@ -120,7 +124,13 @@ class CodeParser {
                   new_tokens_to_ignore.shift();
                   var tokens_to_ignore_hash = new Hash<Bool>();
                   for (token in new_tokens_to_ignore) {
-                    tokens_to_ignore_hash.set(token, true);
+                    if (token.charAt(0) == "@") {
+                      if (token.toLowerCase() != "@php") {
+                        this.ignored_modules.set(token.substr(1), true);
+                      }
+                    } else {
+                      tokens_to_ignore_hash.set(token, true);
+                    }
                   }
                   tokens_to_ignore.push(tokens_to_ignore_hash);
                 }

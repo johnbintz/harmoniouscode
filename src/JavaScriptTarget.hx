@@ -2,6 +2,7 @@ class JavaScriptTarget {
   static public var code_parser : CodeParser;
   static public var current_results : Array<Result>;
   static public var show_only_modules : Hash<Bool>;
+  static public var ignored_modules : Hash<Bool>;
 
   static public function main() {
     var function_token = new FunctionToken("a","a");
@@ -10,6 +11,7 @@ class JavaScriptTarget {
     code_parser.loadProcessorsFromResources();
 
     show_only_modules = new Hash<Bool>();
+    ignored_modules = new Hash<Bool>();
 
     #if js
       var loading_div = js.Lib.document.getElementById("loading");
@@ -22,6 +24,7 @@ class JavaScriptTarget {
 
   static public function get_results(s : String) {
     current_results = code_parser.parse(s);
+    ignored_modules = code_parser.ignored_modules;
   }
 
   static public function change_result(index_id : Int, state : Bool) : Bool {
@@ -39,6 +42,17 @@ class JavaScriptTarget {
     show_only_modules.set(module, !show_only_modules.get(module));
   }
 
+  static public function change_module_ignore(module : String, state : Bool) {
+    ignored_modules.set(module, state);
+  }
+
+  static public function toggle_ignore_module(module: String) {
+    if (!ignored_modules.exists(module)) {
+      ignored_modules.set(module, false);
+    }
+    ignored_modules.set(module, !ignored_modules.get(module));
+  }
+
   #if js
     static public function change_result_and_redraw(result_checkbox : Dynamic) {
       var index_id_search = ~/^result-enabled-([0-9]+)$/;
@@ -51,11 +65,15 @@ class JavaScriptTarget {
     }
 
     static public function display_version_information() {
-      var version_info = new CodeVersionInformation(current_results);
+      var version_info = new CodeVersionInformation(current_results, ignored_modules);
 
-      var output = "Your code in requires the following minimum PHP & PECL module versions:<ul>";
+      var output = "Your code in requires the following minimum PHP & PECL module versions:";
 
       var minimum = version_info.final_versions.get("minimum");
+
+      output += "<form action=\"\" onsubmit=\"return false\">";
+
+      output += "<ul>";
 
       for (module in minimum.keys()) {
         output += "<li>" + module + ": " + minimum.get(module) + "</li>";
@@ -80,8 +98,6 @@ class JavaScriptTarget {
         output += "<p><strong>This code may not run!</strong></p>";
       }
 
-      output += "<form action=\"\" onsubmit=\"return false\">";
-
       output += "<table cellspacing=\"0\" id=\"results-list\">";
 
       output += "<tr><th>Token</th><th>Ignore?</th>";
@@ -104,6 +120,7 @@ class JavaScriptTarget {
       for (result in current_results) {
         var ok_to_show = true;
         var modules_check_out = true;
+        var any_visible_modules = false;
 
         if (!result.is_enabled) { ignored_tokens.push(result.token); }
 
@@ -116,7 +133,16 @@ class JavaScriptTarget {
           }
         }
 
+        for (module in max_versions.keys()) {
+          if (ignored_modules.exists(module)) {
+            if (!ignored_modules.get(module)) { any_visible_modules = true; }
+          } else {
+            any_visible_modules = true;
+          }
+        }
+
         if (modules_check_out) { ok_to_show = true; }
+        if (!any_visible_modules) { ok_to_show = false; }
 
         if (ok_to_show) {
           var result_class = (result.is_enabled ? "enabled" : "disabled");
@@ -172,6 +198,11 @@ class JavaScriptTarget {
 
     static public function toggle_module_and_redraw(module : String) {
       JavaScriptTarget.toggle_module(module);
+      JavaScriptTarget.display_version_information();
+    }
+
+    static public function toggle_ignore_module_and_redraw(module : String) {
+      JavaScriptTarget.toggle_ignore_module(module);
       JavaScriptTarget.display_version_information();
     }
   #end

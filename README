@@ -5,7 +5,7 @@ To build & use Harmonious Code on Unix-like operating systems:
 * Make sure you're running haXe 2.
 * Download the PHP documentation from CVS.
 * Copy/symlink the phpdoc/phpbook/phpbook-xsl/version.xml file from the 
-  PHP documentationinto the data directory as version.xml.
+  PHP documentation into the data directory as version.xml.
 * Run build/test.sh. This will take a while as functions_tokens_cache.hxd is
   built in the data directory. It will also ensure everything's working
   correctly.
@@ -14,6 +14,26 @@ To build & use Harmonious Code on Unix-like operating systems:
 * Open htdocs/index.html and try analyzing some PHP code.
 * Run build/command_line.sh and pass the path to a PHP file as the first
   parameter. A basic analysis should appear.
+
+To automatically ignore certain tokens and modules, place lines like
+the following in your code:
+
+* To globally ignore a token (ex: json_decode()), place at the top of
+  the file the following:
+
+  //harmonious json_decode
+
+* To ignore a token within a block of code, surround the code in the
+  following:
+
+  //harmonious json_decode
+    ...your code...
+  //harmonious_end
+
+* To ignore a particular module throughout the code (ex: maxdb), place
+  at the top of the file the following:
+
+  //harmonious @maxdb
 
 No build instructions for Windows yet, but Cygwin + haXe for Windows should
 be able to perform the build.

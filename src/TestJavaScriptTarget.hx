@@ -14,5 +14,11 @@ class TestJavaScriptTarget extends haxe.unit.TestCase {
     assertEquals("{}", JavaScriptTarget.show_only_modules.toString());
     JavaScriptTarget.toggle_module("zip");
     assertEquals("{zip => true}", JavaScriptTarget.show_only_modules.toString());
+
+    assertEquals("{}", JavaScriptTarget.ignored_modules.toString());
+    JavaScriptTarget.change_module_ignore("zip", true);
+    assertEquals("{zip => true}", JavaScriptTarget.ignored_modules.toString());
+    JavaScriptTarget.change_module_ignore("zip", false);
+    assertEquals("{zip => false}", JavaScriptTarget.ignored_modules.toString());
   }
 }
