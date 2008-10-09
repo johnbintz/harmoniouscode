@@ -1,8 +1,25 @@
-To build Harmonious Code:
+Harmonious Code's internals are currently a complete mess. You have been warned.
 
-* Make sure you're running haXe 2
-* Download the PHP documentation from CVS
+To build & use Harmonious Code on Unix-like operating systems:
+
+* Make sure you're running haXe 2.
+* Download the PHP documentation from CVS.
 * Copy/symlink the phpdoc/phpbook/phpbook-xsl/version.xml file from the 
-  PHP documentationinto the data directory
-* Run test.sh. This will take a while as functions_tokens_cache.hxd is
-  built in the data directory.
+  PHP documentationinto the data directory as version.xml.
+* Run build/test.sh. This will take a while as functions_tokens_cache.hxd is
+  built in the data directory. It will also ensure everything's working
+  correctly.
+* Run build/javascript.sh. The harmoniouscode.js file will be generated
+  in htdocs.
+* Open htdocs/index.html and try analyzing some PHP code.
+* Run build/command_line.sh and pass the path to a PHP file as the first
+  parameter. A basic analysis should appear.
+
+No build instructions for Windows yet, but Cygwin + haXe for Windows should
+be able to perform the build.
+
+Patches are welcomed - send them to john@coswellproductions.com.
+
+Visit http://harmoniouscode.coswellproductions.com/. Tell your friends.
+
+Harmonious Code is Copyright 2008 John Bintz.
