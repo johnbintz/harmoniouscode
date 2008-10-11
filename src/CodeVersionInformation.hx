@@ -178,12 +178,7 @@ class CodeVersionInformation {
       this.all_modules.push(source);
     }
 
-    this.all_modules.sort(function(a, b) {
-      if (a == "PHP") { return -1; }
-      if (b == "PHP") { return -1; }
-      if (a == b) { return 0; }
-      return (a < b) ? -1 : 1;
-    });
+    this.all_modules.sort(CodeVersionInformation.module_name_sorter);
 
     for (source in start_maximum_versions.keys()) {
       this.maximum_versions.set(source, get_lowest_version(start_maximum_versions.get(source)));
@@ -195,6 +190,10 @@ class CodeVersionInformation {
     this.final_versions.set("maximum", maximum_versions);
   }
 
+  /**
+    Return true if the minimum and maximum module versions within this
+    CodeVersionInformation object will produce runnable code.
+  **/
   public function is_valid() {
     for (source in this.maximum_versions.keys()) {
       var versions = [ this.maximum_versions.get(source), this.minimum_versions.get(source) ];
@@ -204,5 +203,15 @@ class CodeVersionInformation {
       }
     }
     return true;
+  }
+
+  /**
+    Sort module names, making sure PHP is first in the list.
+  **/
+  public static function module_name_sorter(a : String, b : String) : Int {
+    if (a.toLowerCase() == "php") { return -1; }
+    if (b.toLowerCase() == "php") { return 1; }
+    if (a == b) { return 0; }
+    return (a < b) ? -1 : 1;
   }
 }

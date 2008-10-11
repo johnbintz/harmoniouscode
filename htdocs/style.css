@@ -23,7 +23,8 @@ div#loading {
 }
 
 table {
-  border-left: solid #aaa 1px
+  border-left: solid #aaa 1px;
+  margin-bottom: 10px;
 }
 
 td, th {
@@ -34,7 +35,8 @@ td {
   padding: 0 3px
 }
 
-td.token {
+td.token,
+td.module {
   text-align: center;
   font-weight: bold
 }

@@ -18,13 +18,13 @@
       </div>
       <div id="output"></div>
       <div id="permanent-ignore" style="display: none">
-        To permanently ignore tokens, do one of the following:
+        To permanently ignore tokens (and globally ignore modules), do one of the following:
         <ul>
           <li>To ignore globally, place at the top of the file on its own line:
-            <blockquote><code>//harmonious <span class="ignore-code-holder"></span></code></blockquote>
+            <blockquote><code>//harmonious <span id="ignore-code-holder-global"></span></code></blockquote>
           </li>
-          <li>To ignore within a particular block of code, wrap the code in the following:
-            <blockquote><code>//harmonious <span class="ignore-code-holder"></span><br />
+          <li id="permanent-ignore-block">To ignore within a particular block of code, wrap the code in the following:
+            <blockquote><code>//harmonious <span id="ignore-code-holder-block"></span><br />
             &nbsp;&nbsp;...your code...<br />
             //harmonious_end</code></blockquote>
           </li>

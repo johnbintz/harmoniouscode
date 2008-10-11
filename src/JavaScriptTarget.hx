@@ -1,8 +1,12 @@
+/**
+  The JavaScript functionality of Harmonious Code.
+**/
 class JavaScriptTarget {
   static public var code_parser : CodeParser;
   static public var current_results : Array<Result>;
   static public var show_only_modules : Hash<Bool>;
   static public var ignored_modules : Hash<Bool>;
+  static public var manually_ignored_modules : Hash<Bool>;
 
   static public function main() {
     var function_token = new FunctionToken("a","a");
@@ -12,6 +16,7 @@ class JavaScriptTarget {
 
     show_only_modules = new Hash<Bool>();
     ignored_modules = new Hash<Bool>();
+    manually_ignored_modules = new Hash<Bool>();
 
     #if js
       var loading_div = js.Lib.document.getElementById("loading");
@@ -22,11 +27,18 @@ class JavaScriptTarget {
     #end
   }
 
+  /**
+    Parse a String and get the token results and ignored modules.
+  **/
   static public function get_results(s : String) {
     current_results = code_parser.parse(s);
     ignored_modules = code_parser.ignored_modules;
+    manually_ignored_modules = new Hash<Bool>();
   }
 
+  /**
+    Enable/disable a particular Result from the version calculations.
+  **/
   static public function change_result(index_id : Int, state : Bool) : Bool {
     if (index_id < current_results.length) {
       current_results[index_id].is_enabled = state;
@@ -35,6 +47,9 @@ class JavaScriptTarget {
     return false;
   }
 
+  /**
+    Toggle the visibility of module functions.
+  **/
   static public function toggle_module(module : String) {
     if (!show_only_modules.exists(module)) {
       show_only_modules.set(module, false);
@@ -42,15 +57,21 @@ class JavaScriptTarget {
     show_only_modules.set(module, !show_only_modules.get(module));
   }
 
+  /**
+    Set the ignore state on a module.
+  **/
   static public function change_module_ignore(module : String, state : Bool) {
-    ignored_modules.set(module, state);
+    manually_ignored_modules.set(module, state);
   }
 
-  static public function toggle_ignore_module(module: String) {
-    if (!ignored_modules.exists(module)) {
-      ignored_modules.set(module, false);
+  /**
+    Toggle ignoring a module.
+  **/
+  static public function toggle_ignore_module(module : String) {
+    if (!manually_ignored_modules.exists(module)) {
+      manually_ignored_modules.set(module, false);
     }
-    ignored_modules.set(module, !ignored_modules.get(module));
+    manually_ignored_modules.set(module, !manually_ignored_modules.get(module));
   }
 
   #if js
@@ -75,11 +96,71 @@ class JavaScriptTarget {
 
       output += "<ul>";
 
-      for (module in minimum.keys()) {
-        output += "<li>" + module + ": " + minimum.get(module) + "</li>";
+      var all_modules_hash = new Hash<Bool>();
+
+      for (module in minimum.keys()) { all_modules_hash.set(module, true); }
+      for (module in ignored_modules.keys()) { all_modules_hash.set(module, true); }
+      for (module in manually_ignored_modules.keys()) { all_modules_hash.set(module, true); }
+
+      var all_modules = new Array<String>();
+
+      for (module in all_modules_hash.keys()) { all_modules.push(module); }
+
+      all_modules.sort(CodeVersionInformation.module_name_sorter);
+
+      var ignored_tokens        = new Array<String>();
+      var ignored_modules_array = new Array<String>();
+      for (module in manually_ignored_modules.keys()) {
+        if (manually_ignored_modules.get(module) == true) {
+          ignored_modules_array.push("@" + module);
+        }
       }
 
-      output += "</ul>";
+      output += "<table cellspacing=\"0\" id=\"modules\">";
+      output += "<tr><th>Module</th><th>Ignore?</th><th>Version</th></tr>";
+
+      for (module in all_modules) {
+        var is_ignored = false;
+        var is_ignored_in_source = false;
+        var show_checkbox = true;
+        var is_checked = false;
+
+        if (ignored_modules.exists(module) == true) {
+          is_ignored = true;
+          is_ignored_in_source = true;
+          show_checkbox = false;
+        }
+        if (manually_ignored_modules.get(module) == true) {
+          is_ignored = true;
+          is_checked = true;
+        }
+
+        output += "<tr class=\"" + (is_ignored ? "disabled" : "enabled") + "\"><td class=\"module\">" + module + "</td>";
+
+        if (show_checkbox && (module.toLowerCase() != "php")) {
+          output += "<td align=\"center\"><input type=\"checkbox\" name=\"ignore-module-" + module + "\" id=\"ignore-module-" + module + "\" onclick=\"JavaScriptTarget.toggle_ignore_module_and_redraw('" + module + "')\" " + (is_checked ? " checked" : "") + "/></td>";
+        } else {
+          output += "<td>&nbsp;</td>";
+        }
+
+        if (is_ignored) {
+          if (is_ignored_in_source) {
+            output += "<td>(ignored in source)</td>";
+          } else {
+            output += "<td>(ignored)</td>";
+          }
+        } else {
+          if (minimum.exists(module)) {
+            output += "<td>" + minimum.get(module) + "</td>";
+          } else {
+            output += "<td>&nbsp;</td>";
+          }
+        }
+
+        output += "</tr>";
+      }
+
+      output += "</table>";
 
       var maximum = version_info.final_versions.get("maximum");
       var printed_message = false;
@@ -109,12 +190,13 @@ class JavaScriptTarget {
             classes.push("is-filtering");
           }
         }
-        output += "<th title=\"click to toggle filter\" class=\"" + classes.join(" ") + "\" onclick=\"JavaScriptTarget.toggle_module_and_redraw('" + module + "')\">" + module + "</th>";
+
+        if (manually_ignored_modules.get(module) != true) {
+          output += "<th title=\"click to toggle filter\" class=\"" + classes.join(" ") + "\" onclick=\"JavaScriptTarget.toggle_module_and_redraw('" + module + "')\">" + module + "</th>";
+        }
       }
 
       output += "</tr>";
-
-      var ignored_tokens = new Array<String>();
 
       var id_index = 0;
       for (result in current_results) {
@@ -156,31 +238,45 @@ class JavaScriptTarget {
           + ((!result.is_enabled) ? " checked" : "") + " /></td>";
 
           for (module in version_info.all_modules) {
-            output += "<td>";
-            if (max_versions.exists(module)) {
-              output += max_versions.get(module);
-            } else {
-              output += "&nbsp;";
+            if (manually_ignored_modules.get(module) != true) {
+              output += "<td>";
+              if (max_versions.exists(module)) {
+                output += max_versions.get(module);
+              } else {
+                output += "&nbsp;";
+              }
+              output += "</td>";
             }
-            output += "</td>";
           }
 
           output += "</tr>";
-          id_index++;
         }
+        id_index++;
       }
       output += "</table>";
 
       output += "</form>";
 
-      var permanent_ignore_div = js.Lib.document.getElementById('permanent-ignore');
-      if (ignored_tokens.length > 0) {
-        var spans = js.Lib.document.getElementsByTagName("span");
-        for (span_index in 0...spans.length) {
-          if (spans[span_index].className == "ignore-code-holder") {
-            spans[span_index].innerHTML = ignored_tokens.join(" ");
-          }
+      var permanent_ignore_div = js.Lib.document.getElementById("permanent-ignore");
+
+      if ((ignored_modules_array.length > 0) || (ignored_tokens.length > 0)) {
+        var ignored_modules_string = ignored_modules_array.join(" ");
+        var ignored_tokens_string  = ignored_tokens.join(" ");
+
+        var global_span = js.Lib.document.getElementById("ignore-code-holder-global");
+        global_span.innerHTML = ignored_modules_string + " " + ignored_tokens_string;
+
+        var permanent_ignore_block_li = js.Lib.document.getElementById("permanent-ignore-block");
+
+        if (ignored_tokens.length > 0) {
+          var block_span = js.Lib.document.getElementById("ignore-code-holder-block");
+          block_span.innerHTML = ignored_tokens_string;
+
+          permanent_ignore_block_li.style.display = "";
+        } else {
+          permanent_ignore_block_li.style.display = "none";
         }
+
         permanent_ignore_div.style.display = "";
       } else {
         permanent_ignore_div.style.display = "none";
