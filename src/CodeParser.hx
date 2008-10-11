@@ -1,3 +1,7 @@
+/**
+  CodeParser parses a block of PHP code and returns information on the
+  tokens it finds.
+**/
 class CodeParser {
   public var token_processors(get_token_processors, null) : Hash<TokenProcessor>;
   public var ignored_modules(get_ignored_modules, null) : Hash<Bool>;
@@ -8,6 +12,9 @@ class CodeParser {
   }
 
   #if neko
+    /**
+      Load all possible token processors from disk.
+    **/
     public function loadProcessorsFromDisk() {
       var functionProcessor = new FunctionTokenProcessor();
       if (!functionProcessor.load_from_cache()) {
