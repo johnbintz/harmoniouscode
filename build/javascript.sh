@@ -1,6 +1,6 @@
 #!/bin/bash
 
 ./setup.sh
-haxe -cp ../src -neko ../neko/regenerate.n -main RegenerateDataFiles && neko ../neko/regenerate.n
+./regenerate_data_files.sh
 rm ../htdocs/harmoniouscode.js
 haxe javascript.hxml

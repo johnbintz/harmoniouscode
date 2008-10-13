@@ -5,6 +5,7 @@ class MyTests {
     r.add(new TestFunctionToken());
     r.add(new TestFunctionTokenProcessor());
     r.add(new TestConstantToken());
+    r.add(new TestConstantTokenProcessor());
     r.add(new TestCodeParser());
     r.add(new TestCodeVersionInformation());
     r.add(new TestResult());

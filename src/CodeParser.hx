@@ -15,22 +15,35 @@ class CodeParser {
     /**
       Load all possible token processors from disk.
     **/
-    public function loadProcessorsFromDisk() {
-      var functionProcessor = new FunctionTokenProcessor();
-      if (!functionProcessor.load_from_cache()) {
-        functionProcessor.populate_from_file();
-        functionProcessor.save_to_cache();
+    public function load_processors_from_disk() {
+      var function_processor = new FunctionTokenProcessor();
+      if (!function_processor.load_from_cache()) {
+        function_processor.populate_from_file();
+        function_processor.save_to_cache();
       }
 
-      this.token_processors.set(Type.getClassName(Type.getClass(functionProcessor)), functionProcessor);
+      this.token_processors.set(Type.getClassName(Type.getClass(function_processor)), function_processor);
+
+      var constant_processor = new ConstantTokenProcessor();
+      if (!constant_processor.load_from_cache()) {
+        constant_processor.populate_from_files();
+        constant_processor.save_to_cache();
+      }
+
+      this.token_processors.set(Type.getClassName(Type.getClass(constant_processor)), constant_processor);
     }
   #end
 
-  public function loadProcessorsFromResources() {
-    var functionProcessor = new FunctionTokenProcessor();
-    functionProcessor.load_from_resource();
+  public function load_processors_from_resources() {
+    var function_processor = new FunctionTokenProcessor();
+    function_processor.load_from_resource();
 
-    this.token_processors.set(Type.getClassName(Type.getClass(functionProcessor)), functionProcessor);
+    this.token_processors.set(Type.getClassName(Type.getClass(function_processor)), function_processor);
+
+    var constant_processor = new ConstantTokenProcessor();
+    constant_processor.load_from_resource();
+
+    this.token_processors.set(Type.getClassName(Type.getClass(constant_processor)), constant_processor);
   }
 
   public function get_token_processors() { return this.token_processors; }
@@ -51,8 +64,9 @@ class CodeParser {
     this.ignored_modules = new Hash<Bool>();
 
     var function_token_processor = this.token_processors.get("FunctionTokenProcessor");
+    var constant_token_processor = this.token_processors.get("ConstantTokenProcessor");
 
-    var function_tokens_found = new Hash<Bool>();
+    var tokens_found = new Hash<Bool>();
     var tokens_to_ignore = new Array<Hash<Bool>>();
     var flattened_tokens = new Hash<Bool>();
 
@@ -103,15 +117,19 @@ class CodeParser {
 
           is_capturing = false;
 
-          if (!flattened_tokens.exists(token)) {
-            if (is_function) {
-              if (!function_tokens_found.exists(token)) {
+          if (!tokens_found.exists(token)) {
+            if (!flattened_tokens.exists(token)) {
+              if (is_function) {
                 if (function_token_processor.tokenHash.exists(token)) {
                   results.push(function_token_processor.tokenHash.get(token).toResult());
                 }
-                function_tokens_found.set(token, true);
+              } else {
+                if (constant_token_processor.tokenHash.exists(token)) {
+                  results.push(constant_token_processor.tokenHash.get(token).toResult());
+                }
               }
             }
+            tokens_found.set(token, true);
           }
         } else {
           if (current == "/") {
@@ -149,6 +167,14 @@ class CodeParser {
         }
       }
       index++;
+    }
+
+    if (is_capturing) {
+      var token = s.substr(capture_index, index - capture_index);
+
+      if (constant_token_processor.tokenHash.exists(token)) {
+        results.push(constant_token_processor.tokenHash.get(token).toResult());
+      }
     }
 
     results.sort(Result.compare);

@@ -7,19 +7,21 @@ class TestCodeParser extends haxe.unit.TestCase {
     [ "//harmonious json_encode\narray_shift() json_encode()\n//harmonious_end", "1", "{minimum => {PHP => 4}, maximum => {}}" ],
     [ "//harmonious json_encode\narray_shift() json_encode()\n//harmonious_end\njson_encode()", "2", "{minimum => {PHP => 5.2.0, json => 1.2.0}, maximum => {}}" ],
     [ "//harmonious @json\narray_shift() json_encode()\n//harmonious_end\njson_encode()", "2", "{minimum => {PHP => 5.2.0}, maximum => {}}" ],
-    [ "//harmonious @PHP\narray_shift()", "1", "{minimum => {PHP => 4}, maximum => {}}" ]
+    [ "//harmonious @PHP\narray_shift()", "1", "{minimum => {PHP => 4}, maximum => {}}" ],
+    [ "PATHINFO_BASENAME", "1", "{minimum => {PHP => 4}, maximum => {}}" ]
   ];
 
   #if neko
     function testCodeParserLoadTokens() {
       var p = new CodeParser();
-      p.loadProcessorsFromDisk();
+      p.load_processors_from_disk();
       assertTrue(p.token_processors.exists("FunctionTokenProcessor"));
+      assertTrue(p.token_processors.exists("ConstantTokenProcessor"));
     }
 
     function testProcessCode() {
       var p = new CodeParser();
-      p.loadProcessorsFromDisk();
+      p.load_processors_from_disk();
 
       for (code in test_code) {
         var result = p.parse(code[0]);

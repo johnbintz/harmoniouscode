@@ -5,7 +5,7 @@ class TestFunctionTokenProcessor extends haxe.unit.TestCase {
   var tokenProcessor : FunctionTokenProcessor;
 
   public override function setup() {
-    testXml = "<versions><function name='" + functionName + "' from='" + functionFrom + "'/></versions>";
+    testXml = "<versions> <function name='" + functionName + "' from='" + functionFrom + "'/> </versions>";
     tokenProcessor = new FunctionTokenProcessor();
     tokenProcessor.populate_from_string(testXml);
   }

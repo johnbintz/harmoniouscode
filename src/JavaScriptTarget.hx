@@ -10,9 +10,10 @@ class JavaScriptTarget {
 
   static public function main() {
     var function_token = new FunctionToken("a","a");
+    var constant_token = new ConstantToken("a","a");
 
     code_parser = new CodeParser();
-    code_parser.loadProcessorsFromResources();
+    code_parser.load_processors_from_resources();
 
     show_only_modules = new Hash<Bool>();
     ignored_modules = new Hash<Bool>();

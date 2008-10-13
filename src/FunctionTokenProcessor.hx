@@ -1,7 +1,7 @@
 class FunctionTokenProcessor extends TokenProcessor {
   public static var cachePath : String = "../data/functions_tokens_cache.hxd";
   override public function get_cache_path() { return FunctionTokenProcessor.cachePath; }
-  public static var sourcePath : String = "../data/versions.xml";
+  public static var sourcePath : String = "../data/phpdoc_function_versions.xml";
 
   #if neko
     public function populate_from_file() {
