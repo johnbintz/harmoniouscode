@@ -2,9 +2,10 @@ class FunctionTokenProcessor extends TokenProcessor {
   public static var cachePath : String = "../data/functions_tokens_cache.hxd";
   override public function get_cache_path() { return FunctionTokenProcessor.cachePath; }
   public static var sourcePath : String = "../data/phpdoc_function_versions.xml";
+  override public function get_default_token_type() { return FunctionToken; }
 
   #if neko
-    public function populate_from_file() {
+    public override function populate_from_file() {
       this.populate_from_string(neko.io.File.getContent(sourcePath));
     }
 

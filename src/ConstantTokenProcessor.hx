@@ -1,6 +1,7 @@
 class ConstantTokenProcessor extends TokenProcessor {
   public static var cachePath : String = "../data/constant_tokens_cache.hxd";
   override public function get_cache_path() { return ConstantTokenProcessor.cachePath; }
+  override public function get_default_token_type() { return ConstantToken; }
 
   public static var source_path : String = "../data";
   public static var source_file_pattern : EReg = ~/phpdoc_constants_.*\.xml/;
@@ -16,7 +17,7 @@ class ConstantTokenProcessor extends TokenProcessor {
   ];
 
   #if neko
-    public function populate_from_files() {
+    public override function populate_from_file() {
       this.tokenHash = new Hash<Token>();
       for (file in neko.FileSystem.readDirectory(source_path)) {
         if (source_file_pattern.match(file)) {

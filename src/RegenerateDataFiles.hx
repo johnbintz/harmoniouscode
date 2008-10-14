@@ -10,7 +10,7 @@ class RegenerateDataFiles {
     var constantProcessor = new ConstantTokenProcessor();
     if (!constantProcessor.load_from_cache()) {
       neko.Lib.print("Regenerating constants cache...\n");
-      constantProcessor.populate_from_files();
+      constantProcessor.populate_from_file();
       constantProcessor.save_to_cache();
     }
   }

@@ -1,3 +1,8 @@
+import FunctionTokenProcessor;
+import ConstantTokenProcessor;
+import FunctionToken;
+import ConstantToken;
+
 /**
   The JavaScript functionality of Harmonious Code.
 **/
@@ -9,9 +14,6 @@ class JavaScriptTarget {
   static public var manually_ignored_modules : Hash<Bool>;
 
   static public function main() {
-    var function_token = new FunctionToken("a","a");
-    var constant_token = new ConstantToken("a","a");
-
     code_parser = new CodeParser();
     code_parser.load_processors_from_resources();
 

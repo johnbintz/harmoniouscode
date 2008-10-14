@@ -6,6 +6,8 @@ class CodeParser {
   public var token_processors(get_token_processors, null) : Hash<TokenProcessor>;
   public var ignored_modules(get_ignored_modules, null) : Hash<Bool>;
 
+  public static var processor_types = [ "FunctionTokenProcessor", "ConstantTokenProcessor" ];
+
   public function new() {
     this.token_processors = new Hash<TokenProcessor>();
     this.ignored_modules  = new Hash<Bool>();
@@ -16,34 +18,30 @@ class CodeParser {
       Load all possible token processors from disk.
     **/
     public function load_processors_from_disk() {
-      var function_processor = new FunctionTokenProcessor();
-      if (!function_processor.load_from_cache()) {
-        function_processor.populate_from_file();
-        function_processor.save_to_cache();
+      for (processor_type_name in processor_types) {
+        var processor : TokenProcessor = Type.createInstance(Type.resolveClass(processor_type_name), []);
+
+        if (!processor.load_from_cache()) {
+          processor.populate_from_file();
+          processor.save_to_cache();
+        }
+
+        this.token_processors.set(processor_type_name, processor);
       }
-
-      this.token_processors.set(Type.getClassName(Type.getClass(function_processor)), function_processor);
-
-      var constant_processor = new ConstantTokenProcessor();
-      if (!constant_processor.load_from_cache()) {
-        constant_processor.populate_from_files();
-        constant_processor.save_to_cache();
-      }
-
-      this.token_processors.set(Type.getClassName(Type.getClass(constant_processor)), constant_processor);
     }
   #end
 
+  /**
+    Load all possible token processors form haXe Resources.
+  **/
   public function load_processors_from_resources() {
-    var function_processor = new FunctionTokenProcessor();
-    function_processor.load_from_resource();
+    for (processor_type_name in processor_types) {
+      var processor : TokenProcessor = Type.createInstance(Type.resolveClass(processor_type_name), []);
 
-    this.token_processors.set(Type.getClassName(Type.getClass(function_processor)), function_processor);
+      processor.load_from_resource();
 
-    var constant_processor = new ConstantTokenProcessor();
-    constant_processor.load_from_resource();
-
-    this.token_processors.set(Type.getClassName(Type.getClass(constant_processor)), constant_processor);
+      this.token_processors.set(processor_type_name, processor);
+    }
   }
 
   public function get_token_processors() { return this.token_processors; }
@@ -62,9 +60,6 @@ class CodeParser {
   public function parse(s : String) : Array<Result> {
     var results = new Array<Result>();
     this.ignored_modules = new Hash<Bool>();
-
-    var function_token_processor = this.token_processors.get("FunctionTokenProcessor");
-    var constant_token_processor = this.token_processors.get("ConstantTokenProcessor");
 
     var tokens_found = new Hash<Bool>();
     var tokens_to_ignore = new Array<Hash<Bool>>();
@@ -119,17 +114,13 @@ class CodeParser {
 
           if (!tokens_found.exists(token)) {
             if (!flattened_tokens.exists(token)) {
-              if (is_function) {
-                if (function_token_processor.tokenHash.exists(token)) {
-                  results.push(function_token_processor.tokenHash.get(token).toResult());
-                }
-              } else {
-                if (constant_token_processor.tokenHash.exists(token)) {
-                  results.push(constant_token_processor.tokenHash.get(token).toResult());
+              for (token_processor in this.token_processors.iterator()) {
+                if (token_processor.tokenHash.exists(token)) {
+                  results.push(token_processor.tokenHash.get(token).toResult()); break;
                 }
               }
+              tokens_found.set(token, true);
             }
-            tokens_found.set(token, true);
           }
         } else {
           if (current == "/") {
@@ -172,8 +163,10 @@ class CodeParser {
     if (is_capturing) {
       var token = s.substr(capture_index, index - capture_index);
 
-      if (constant_token_processor.tokenHash.exists(token)) {
-        results.push(constant_token_processor.tokenHash.get(token).toResult());
+      for (token_processor in this.token_processors.iterator()) {
+        if (token_processor.tokenHash.exists(token)) {
+          results.push(token_processor.tokenHash.get(token).toResult()); break;
+        }
       }
     }
 
