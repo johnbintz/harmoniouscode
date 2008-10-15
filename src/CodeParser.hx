@@ -1,3 +1,6 @@
+import FunctionTokenProcessor;
+import ConstantTokenProcessor;
+
 /**
   CodeParser parses a block of PHP code and returns information on the
   tokens it finds.

@@ -24,7 +24,6 @@ class TestFunctionTokenProcessor extends haxe.unit.TestCase {
     var unwound_tokens = token_processor.unwind_tokens();
 
     assertTrue(unwound_tokens.toString().length < target_token_hash.length);
-    trace(unwound_tokens.toString().length + " bytes vs. " + target_token_hash.length);
 
     token_processor = new FunctionTokenProcessor();
     token_processor.populate_from_unwound_tokens(unwound_tokens);
