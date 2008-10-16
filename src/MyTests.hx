@@ -2,6 +2,7 @@ class MyTests {
   static function main() {
     var r = new haxe.unit.TestRunner();
     r.add(new TestToken());
+    r.add(new TestTokenProcessor());
     r.add(new TestFunctionToken());
     r.add(new TestFunctionTokenProcessor());
     r.add(new TestConstantToken());

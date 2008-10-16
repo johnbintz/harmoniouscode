@@ -7,13 +7,18 @@ body, td, div, li, p, span {
   font-size: 12px;
 }
 
+h1 {
+  text-align: center
+}
+
 div#form-holder {
   text-align: center
 }
 
 input#analyze-code-button {
-  width: 200px;
+  width: 750px;
   padding: 5px;
+  margin-top: 5px;
 }
 
 div#loading {
@@ -63,13 +68,32 @@ th.is-filtering {
   color: blue;
 }
 
+textarea#source {
+  width: 750px;
+  height: 250px;
+}
+
 div#footer {
   text-align: center;
   font-size: 10px;
   color: #555;
-  font-style: oblique
+  font-style: oblique;
+  border-top: solid #555 1px;
+  padding-top: 5px;
+  margin-top: 5px
 }
 
 span.ignore-code-holder {
   font-family: monospace
+}
+
+div#processing, div#code-announcement {
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold
+}
+
+div#code-announcement {
+  border-bottom: solid #555 1px;
+  margin-bottom: 5px
 }

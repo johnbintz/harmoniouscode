@@ -1,17 +1,25 @@
 class FunctionTokenProcessor extends TokenProcessor {
-  public static var cachePath : String = "../data/functions_tokens_cache.hxd";
-  override public function get_cache_path() { return FunctionTokenProcessor.cachePath; }
-  public static var sourcePath : String = "../data/phpdoc_function_versions.xml";
+  public static var source_path : String = "../data/phpdoc_function_versions.xml";
   override public function get_default_token_type() { return FunctionToken; }
 
   #if neko
     public override function populate_from_file() {
-      this.populate_from_string(neko.io.File.getContent(sourcePath));
+      this.populate_from_string(neko.io.File.getContent(source_path));
     }
 
     public function populate_from_string(s : String) {
       this.tokenHash = new Hash<Token>();
-      for (child in Xml.parse(s).firstElement()) {
+      var tokens_parsed = 0;
+
+      //
+      // haXe XML parsing is slow, as it uses a custom XML parser.
+      // so I'll use a custom XML parser for this data.
+      //
+      /*var start = Date.now();
+      var first_element = Xml.parse(s).firstElement();
+      var end = Date.now();
+      trace(end.getTime() - start.getTime());
+      for (child in first_element) {
         if (child.nodeType == Xml.Element) {
           if (child.nodeName == "function") {
             var version = child.get("from");
@@ -19,9 +27,45 @@ class FunctionTokenProcessor extends TokenProcessor {
             version = ~/\:/.replace(version, " ");
             var token = child.get("name");
             this.tokenHash.set(token, new FunctionToken(child.get("name"), version));
+            tokens_parsed++;
           }
         }
+      }*/
+
+      var s_length = s.length;
+      var i = 0;
+
+      var version_regexp = ~/from=\'([^\']*)\'/i;
+      var token_regexp   = ~/name=\'([^\']*)\'/i;
+
+      while (i < s_length) {
+        var new_i = s.indexOf("<function", i);
+        if (new_i != -1) {
+          var tag_end = s.indexOf(">", new_i);
+          if (tag_end != -1) {
+            var tag = s.substr(new_i, tag_end - new_i + 1);
+
+            if (version_regexp.match(tag) && token_regexp.match(tag)) {
+              var version = version_regexp.matched(1);
+              var token   = token_regexp.matched(1);
+              version = ~/PECL /.replace(version, "");
+              version = ~/\:/.replace(version, " ");
+
+              this.tokenHash.set(token, new FunctionToken(token, version));
+              tokens_parsed++;
+              i = tag_end;
+            } else {
+              i++;
+            }
+          } else {
+            i++;
+          }
+        } else {
+          break;
+        }
       }
+      
+      trace("tokens parsed: " + tokens_parsed);
     }
   #end
 }

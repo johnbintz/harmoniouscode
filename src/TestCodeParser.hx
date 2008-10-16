@@ -14,14 +14,14 @@ class TestCodeParser extends haxe.unit.TestCase {
   #if neko
     function testCodeParserLoadTokens() {
       var p = new CodeParser();
-      p.load_processors_from_disk();
+      p.load_all_processors_from_disk();
       assertTrue(p.token_processors.exists("FunctionTokenProcessor"));
       assertTrue(p.token_processors.exists("ConstantTokenProcessor"));
     }
 
     function testProcessCode() {
       var p = new CodeParser();
-      p.load_processors_from_disk();
+      p.load_all_processors_from_disk();
 
       for (code in test_code) {
         var result = p.parse(code[0]);

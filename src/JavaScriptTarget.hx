@@ -91,13 +91,11 @@ class JavaScriptTarget {
     static public function display_version_information() {
       var version_info = new CodeVersionInformation(current_results, ignored_modules);
 
-      var output = "Your code in requires the following minimum PHP & PECL module versions:";
+      var output = "<div id=\"code-announcement\">Your code requires the following minimum PHP & PECL module versions:</div>";
 
       var minimum = version_info.final_versions.get("minimum");
 
       output += "<form action=\"\" onsubmit=\"return false\">";
-
-      output += "<ul>";
 
       var all_modules_hash = new Hash<Bool>();
 
@@ -291,8 +289,20 @@ class JavaScriptTarget {
     static public function do_analysis(textarea) {
       show_only_modules = new Hash<Bool>();
 
-      JavaScriptTarget.get_results(textarea.value);
-      JavaScriptTarget.display_version_information();
+      js.Lib.document.getElementById('processing').innerHTML = "Analyzing code...";
+      untyped {
+        js.Lib.document.getElementById('analyze-code-button').disabled = true;
+      }
+
+      haxe.Timer.delay(function() {
+        JavaScriptTarget.get_results(textarea.value);
+        JavaScriptTarget.display_version_information();
+
+        js.Lib.document.getElementById('processing').innerHTML = "";
+        untyped {
+          js.Lib.document.getElementById('analyze-code-button').disabled = false;
+        }
+      }, 100);
     }
 
     static public function toggle_module_and_redraw(module : String) {

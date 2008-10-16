@@ -20,16 +20,9 @@ class CodeParser {
     /**
       Load all possible token processors from disk.
     **/
-    public function load_processors_from_disk() {
-      for (processor_type_name in processor_types) {
-        var processor : TokenProcessor = Type.createInstance(Type.resolveClass(processor_type_name), []);
-
-        if (!processor.load_from_cache()) {
-          processor.populate_from_file();
-          processor.save_to_cache();
-        }
-
-        this.token_processors.set(processor_type_name, processor);
+    public function load_all_processors_from_disk() {
+      for (processor in TokenProcessor.load_all_from_cache()) {
+        this.token_processors.set(Type.getClassName(Type.getClass(processor)), processor);
       }
     }
   #end
@@ -38,12 +31,8 @@ class CodeParser {
     Load all possible token processors form haXe Resources.
   **/
   public function load_processors_from_resources() {
-    for (processor_type_name in processor_types) {
-      var processor : TokenProcessor = Type.createInstance(Type.resolveClass(processor_type_name), []);
-
-      processor.load_from_resource();
-
-      this.token_processors.set(processor_type_name, processor);
+    for (processor in TokenProcessor.load_all_from_resource()) {
+      this.token_processors.set(Type.getClassName(Type.getClass(processor)), processor);
     }
   }
 
@@ -118,8 +107,10 @@ class CodeParser {
           if (!tokens_found.exists(token)) {
             if (!flattened_tokens.exists(token)) {
               for (token_processor in this.token_processors.iterator()) {
-                if (token_processor.tokenHash.exists(token)) {
-                  results.push(token_processor.tokenHash.get(token).toResult()); break;
+                if ((token_processor.get_default_token_type() == FunctionToken) == is_function) {
+                  if (token_processor.tokenHash.exists(token)) {
+                    results.push(token_processor.tokenHash.get(token).toResult()); break;
+                  }
                 }
               }
               tokens_found.set(token, true);

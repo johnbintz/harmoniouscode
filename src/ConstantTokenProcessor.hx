@@ -1,6 +1,4 @@
 class ConstantTokenProcessor extends TokenProcessor {
-  public static var cachePath : String = "../data/constant_tokens_cache.hxd";
-  override public function get_cache_path() { return ConstantTokenProcessor.cachePath; }
   override public function get_default_token_type() { return ConstantToken; }
 
   public static var source_path : String = "../data";

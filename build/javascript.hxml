@@ -1,5 +1,4 @@
 -js ../htdocs/harmoniouscode.js
 -main JavaScriptTarget
--resource ../data/functions_tokens_cache.hxd
--resource ../data/constant_tokens_cache.hxd
+-resource ../data/all_tokens.hxd
 -cp ../src

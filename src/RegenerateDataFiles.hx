@@ -1,17 +1,3 @@
 class RegenerateDataFiles {
-  public static function main() {
-    var functionProcessor = new FunctionTokenProcessor();
-    if (!functionProcessor.load_from_cache()) {
-      neko.Lib.print("Regenerating functions cache...\n");
-      functionProcessor.populate_from_file();
-      functionProcessor.save_to_cache();
-    }
-
-    var constantProcessor = new ConstantTokenProcessor();
-    if (!constantProcessor.load_from_cache()) {
-      neko.Lib.print("Regenerating constants cache...\n");
-      constantProcessor.populate_from_file();
-      constantProcessor.save_to_cache();
-    }
-  }
+  public static function main() { TokenProcessor.save_all_to_cache(); }
 }
