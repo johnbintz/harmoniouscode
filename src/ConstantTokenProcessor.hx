@@ -1,3 +1,15 @@
+/**
+  ConstantTokenProcessor attempts to parse the PHP constants documentation
+  to glean version information about constants. This is done by examining
+  the descriptions of constants to see if the string:
+
+  ~/since php ([0-9\.]+)/i
+
+  exists in the description and taking that as the minimum version
+  necessary to use that constant. This method is imperfect and probably
+  inaccurate, and one should always remember to test one's code on
+  the target platform to ensure maximum compatibility.
+**/
 class ConstantTokenProcessor extends TokenProcessor {
   override public function get_default_token_type() { return ConstantToken; }
 
@@ -16,19 +28,25 @@ class ConstantTokenProcessor extends TokenProcessor {
 
   #if neko
     public override function populate_from_file() {
-      this.tokenHash = new Hash<Token>();
+      this.token_hash = new Hash<Token>();
       for (file in neko.FileSystem.readDirectory(source_path)) {
         if (source_file_pattern.match(file)) {
-          trace(file + ": " + this.append_from_string(neko.io.File.getContent(source_path + "/" + file)));
+          //trace(file + ": " + this.append_from_string(neko.io.File.getContent(source_path + "/" + file)));
+          this.append_from_string(neko.io.File.getContent(source_path + "/" + file));
         }
       }
     }
 
+    /**
+      Process an XML string and append any tokens found to the token store
+      for this processor.
+    **/
     public function append_from_string(s : String) : String {
       var type = "none";
       for (child in Xml.parse(s).firstElement()) {
         if (child.nodeType == Xml.Element) {
           var any_skipped;
+          // dig past unnecessary nodes at the top of the tree
           do {
             any_skipped = false;
             for (nodes_to_skip in node_skip_information) {
@@ -69,13 +87,13 @@ class ConstantTokenProcessor extends TokenProcessor {
                     } catch (e : Dynamic) {}
                   }
                   if (token_name != null) {
-                    this.tokenHash.set(token_name, new ConstantToken(token_name, "PHP " + token_version));
+                    this.token_hash.set(token_name, new ConstantToken(token_name, "PHP " + token_version));
                   }
                 }
               }
             }
           }
-          
+
           // variablelist
           if (child.nodeName == "variablelist") {
             type = "variablelist";
@@ -105,7 +123,7 @@ class ConstantTokenProcessor extends TokenProcessor {
                 }
 
                 if (token_name != null) {
-                  this.tokenHash.set(token_name, new ConstantToken(token_name, "PHP " + token_version));
+                  this.token_hash.set(token_name, new ConstantToken(token_name, "PHP " + token_version));
                 }
               }
             }
@@ -149,7 +167,7 @@ class ConstantTokenProcessor extends TokenProcessor {
                     }
                   }
                   if (token_name != null) {
-                    this.tokenHash.set(token_name, new ConstantToken(token_name, "PHP " + token_version));
+                    this.token_hash.set(token_name, new ConstantToken(token_name, "PHP " + token_version));
                   }
                 }
               }
@@ -160,8 +178,11 @@ class ConstantTokenProcessor extends TokenProcessor {
       return type;
     }
 
+    /**
+      Populate a new token store from the provided XML string.
+    **/
     public function populate_from_string(s : String) {
-      this.tokenHash = new Hash<Token>();
+      this.token_hash = new Hash<Token>();
       this.append_from_string(s);
     }
   #end

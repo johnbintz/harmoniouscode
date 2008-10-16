@@ -10,6 +10,6 @@ class TestFunctionTokenProcessor extends haxe.unit.TestCase {
   }
 
   public function testGenerateSampleToken() {
-    assertTrue(token_processor.tokenHash.exists(function_name));
+    assertTrue(token_processor.token_hash.exists(function_name));
   }
 }

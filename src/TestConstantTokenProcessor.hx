@@ -20,8 +20,8 @@ class TestConstantTokenProcessor extends haxe.unit.TestCase {
       var tokenProcessor = new ConstantTokenProcessor();
       tokenProcessor.populate_from_string(string);
 
-      assertTrue(tokenProcessor.tokenHash.exists(constant_name));
-      assertEquals("PHP " + constant_from, tokenProcessor.tokenHash.get(constant_name).version);
+      assertTrue(tokenProcessor.token_hash.exists(constant_name));
+      assertEquals("PHP " + constant_from, tokenProcessor.token_hash.get(constant_name).version);
     }
   }
 }

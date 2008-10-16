@@ -12,7 +12,7 @@ class Token {
   public function get_version() { return this.version; }
   public function get_token_type() { return ResultType.Generic; }
 
-  public function toResult() {
+  public function to_result() {
     return new Result(this.token_type, this.token, this.version);
   }
 }

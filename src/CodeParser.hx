@@ -39,6 +39,9 @@ class CodeParser {
   public function get_token_processors() { return this.token_processors; }
   public function get_ignored_modules() { return this.ignored_modules; }
 
+  /**
+    Flatten a list of hashes into a single hash.
+  **/
   private function flatten_tokens_to_ignore(tokens_to_ignore : Array<Hash<Bool>>) : Hash<Bool> {
     var flattened_tokens = new Hash<Bool>();
     for (token_hash in tokens_to_ignore) {
@@ -49,6 +52,9 @@ class CodeParser {
     return flattened_tokens;
   }
 
+  /**
+    Parse a block of PHP code, returning the Result set.
+  **/
   public function parse(s : String) : Array<Result> {
     var results = new Array<Result>();
     this.ignored_modules = new Hash<Bool>();
@@ -108,8 +114,8 @@ class CodeParser {
             if (!flattened_tokens.exists(token)) {
               for (token_processor in this.token_processors.iterator()) {
                 if ((token_processor.get_default_token_type() == FunctionToken) == is_function) {
-                  if (token_processor.tokenHash.exists(token)) {
-                    results.push(token_processor.tokenHash.get(token).toResult()); break;
+                  if (token_processor.token_hash.exists(token)) {
+                    results.push(token_processor.token_hash.get(token).to_result()); break;
                   }
                 }
               }
@@ -117,6 +123,7 @@ class CodeParser {
             }
           }
         } else {
+          // see if this is a //harmonious ignore indicator
           if (current == "/") {
             if (s.indexOf("//harmonious", index) == index) {
               var end_of_line = s.indexOf("\n", index);
@@ -158,8 +165,10 @@ class CodeParser {
       var token = s.substr(capture_index, index - capture_index);
 
       for (token_processor in this.token_processors.iterator()) {
-        if (token_processor.tokenHash.exists(token)) {
-          results.push(token_processor.tokenHash.get(token).toResult()); break;
+        if ((token_processor.get_default_token_type() == FunctionToken) == false) {
+          if (token_processor.token_hash.exists(token)) {
+            results.push(token_processor.token_hash.get(token).to_result()); break;
+          }
         }
       }
     }

@@ -1,21 +1,21 @@
 class TestToken extends haxe.unit.TestCase {
-  static var tokenName : String = "test";
-  static var tokenVersion : String = "5.2";
+  static var token_name : String = "test";
+  static var token_version : String = "5.2";
   var t : Token;
 
   public override function setup() {
-    t = new Token(tokenName, tokenVersion);
+    t = new Token(token_name, token_version);
   }
 
   public function testInstantiateToken() {
-    assertEquals(tokenName, t.token);
-    assertEquals(tokenVersion, t.version);
+    assertEquals(token_name, t.token);
+    assertEquals(token_version, t.version);
   }
 
   public function testToResult() {
-    var result = t.toResult();
+    var result = t.to_result();
     assertEquals(ResultType.Generic, result.type);
-    assertEquals(tokenName, result.token);
-    assertEquals(tokenVersion, result.version);
+    assertEquals(token_name, result.token);
+    assertEquals(token_version, result.version);
   }
 }

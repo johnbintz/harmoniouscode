@@ -1,14 +1,14 @@
 class TestTokenProcessor extends haxe.unit.TestCase {
   function testSerializeMultipleProcessors() {
     var token_processor_one = new TokenProcessor();
-    token_processor_one.tokenHash.set("one", new Token("one", "version one"));
-    token_processor_one.tokenHash.set("two", new Token("two", "version one"));
-    token_processor_one.tokenHash.set("three", new Token("three", "version two"));
+    token_processor_one.token_hash.set("one", new Token("one", "version one"));
+    token_processor_one.token_hash.set("two", new Token("two", "version one"));
+    token_processor_one.token_hash.set("three", new Token("three", "version two"));
 
     var token_processor_two = new TokenProcessor();
-    token_processor_two.tokenHash.set("four", new Token("four", "version one"));
-    token_processor_two.tokenHash.set("five", new Token("five", "version two"));
-    token_processor_two.tokenHash.set("six", new Token("six", "version three"));
+    token_processor_two.token_hash.set("four", new Token("four", "version one"));
+    token_processor_two.token_hash.set("five", new Token("five", "version two"));
+    token_processor_two.token_hash.set("six", new Token("six", "version three"));
 
     var normalized_data = TokenProcessor.normalize_processors([token_processor_one, token_processor_two]);
 

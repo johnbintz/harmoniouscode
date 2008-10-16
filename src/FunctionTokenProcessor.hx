@@ -8,7 +8,7 @@ class FunctionTokenProcessor extends TokenProcessor {
     }
 
     public function populate_from_string(s : String) {
-      this.tokenHash = new Hash<Token>();
+      this.token_hash = new Hash<Token>();
       var tokens_parsed = 0;
 
       //
@@ -26,7 +26,7 @@ class FunctionTokenProcessor extends TokenProcessor {
             version = ~/PECL /.replace(version, "");
             version = ~/\:/.replace(version, " ");
             var token = child.get("name");
-            this.tokenHash.set(token, new FunctionToken(child.get("name"), version));
+            this.token_hash.set(token, new FunctionToken(child.get("name"), version));
             tokens_parsed++;
           }
         }
@@ -51,21 +51,19 @@ class FunctionTokenProcessor extends TokenProcessor {
               version = ~/PECL /.replace(version, "");
               version = ~/\:/.replace(version, " ");
 
-              this.tokenHash.set(token, new FunctionToken(token, version));
+              this.token_hash.set(token, new FunctionToken(token, version));
               tokens_parsed++;
               i = tag_end;
             } else {
               i++;
             }
           } else {
-            i++;
+            break;
           }
         } else {
           break;
         }
       }
-      
-      trace("tokens parsed: " + tokens_parsed);
     }
   #end
 }
