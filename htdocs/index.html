@@ -3,9 +3,18 @@
     <title>Harmonious Code: Will my PHP code and Web hosting work together?</title>
     <meta name="keywords" content="php, static code analysis, web hosting, functions, constants, language features" />
     <link rel="stylesheet" href="style.css" type="text/css" />
+    <!--use thest HTML comments to dynamically insert your own content
+        by wrapping this HTML page in something else:
+
+        $page = file_get_contents("index.html");
+        $page = preg_replace('#<!--head- ->#', "extra head tag stuff", $page);
+        echo $page;
+    -->
+    <!--head-->
   </head>
   <body>
     <h1>Harmonious Code</h1>
+    <!--page_header-->
     <div id="loading">
       Loading...
     </div>
@@ -32,8 +41,10 @@
         </ul>
       </div>
     </div>
+    <!--above_footer-->
     <div id="haxe:trace"></div>
     <div id="footer">
+      <!--footer-->
       <a href="http://harmoniouscode.coswellproductions.com/">Harmonious Code</a> is Copyright &copy; 2008 John Bintz &mdash; Licensed under the GPL Version 2 &mdash; <a href="http://harmoniouscode.coswellproductions.com/project_information/">Project Information and Source Code</a>
     </div>
     <script type="text/javascript" src="harmoniouscode.js"> </script>

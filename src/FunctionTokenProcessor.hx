@@ -40,8 +40,7 @@ class FunctionTokenProcessor extends TokenProcessor {
 
       var version_clean_regexps = [
         function(s) { return ~/PECL /.replace(s, ""); },
-        function(s) { return ~/\:/.replace(s, " "); },
-        function(s) { return ~/\, /.replace(s, ","); }
+        function(s) { return ~/\:/.replace(s, " "); }
       ];
 
       while (i < s_length) {
