@@ -12,8 +12,8 @@ class FunctionTokenProcessor extends TokenProcessor {
       var tokens_parsed = 0;
 
       //
-      // haXe XML parsing is slow, as it uses a custom XML parser.
-      // so I'll use a custom XML parser for this data.
+      // haXe XML parsing is slow, as it uses a custom XML parser...
+      // ..so I'll my own custom XML parser for this particular data.
       //
       /*var start = Date.now();
       var first_element = Xml.parse(s).firstElement();
@@ -38,6 +38,12 @@ class FunctionTokenProcessor extends TokenProcessor {
       var version_regexp = ~/from=\'([^\']*)\'/i;
       var token_regexp   = ~/name=\'([^\']*)\'/i;
 
+      var version_clean_regexps = [
+        function(s) { return ~/PECL /.replace(s, ""); },
+        function(s) { return ~/\:/.replace(s, " "); },
+        function(s) { return ~/\, /.replace(s, ","); }
+      ];
+
       while (i < s_length) {
         var new_i = s.indexOf("<function", i);
         if (new_i != -1) {
@@ -48,8 +54,7 @@ class FunctionTokenProcessor extends TokenProcessor {
             if (version_regexp.match(tag) && token_regexp.match(tag)) {
               var version = version_regexp.matched(1);
               var token   = token_regexp.matched(1);
-              version = ~/PECL /.replace(version, "");
-              version = ~/\:/.replace(version, " ");
+              for (rf in version_clean_regexps) { version = rf(version); }
 
               this.token_hash.set(token, new FunctionToken(token, version));
               tokens_parsed++;

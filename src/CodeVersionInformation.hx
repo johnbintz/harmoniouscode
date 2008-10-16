@@ -1,12 +1,11 @@
+/**
+  Process version information for a set of Results.
+**/
 class CodeVersionInformation {
   public var final_versions : Hash<Hash<String>>;
   public var minimum_versions : Hash<String>;
   public var maximum_versions : Hash<String>;
   public var all_modules : Array<String>;
-
-  public static function breakdown_version_number(version : String) {
-    return version.split(".");
-  }
 
   public static function get_version_lower_than(s : String) : String {
     var greater_than = ~/\&lt;= (.*)$/;
@@ -20,19 +19,17 @@ class CodeVersionInformation {
   public static function breakdown_php_version_string(s : String) {
     var parts = new Array<String>();
 
-    for (regexp in [ ~/^([^\ ]*) (.*)$/ ]) {
-      if (regexp.match(s)) {
-        var version = regexp.matched(2).split("-").shift();
+    var regexp = ~/\W*(\w*) (.*)$/;
+    if (regexp.match(s)) {
+      var version = regexp.matched(2).split("-").shift();
 
-        var greater_than = ~/\&gt;= (.*)$/;
-        if (greater_than.match(version)) {
-          version = greater_than.matched(1);
-        }
-
-        parts.push(regexp.matched(1));
-        parts.push(version);
-        break;
+      var greater_than = ~/\&gt;= (.*)$/;
+      if (greater_than.match(version)) {
+        version = greater_than.matched(1);
       }
+
+      parts.push(regexp.matched(1));
+      parts.push(version);
     }
 
     return parts;
@@ -123,6 +120,10 @@ class CodeVersionInformation {
     return final_versions;
   }
 
+  /**
+    Create a new CodeVersionInformation object based on the provided
+    Result set and, optionally, while ignoring the provided modules.
+  **/
   public function new(results : Array<Result>, ?ignored_modules : Hash<Bool>) {
     var start_minimum_versions = new Hash<Array<String>>();
     var start_maximum_versions = new Hash<Array<String>>();
@@ -132,7 +133,7 @@ class CodeVersionInformation {
         var internal_minimum_version = new Hash<Array<String>>();
         var internal_maximum_version = new Hash<Array<String>>();
 
-        for (part in result.version.split(", ")) {
+        for (part in result.version.split(",")) {
           var version_string_info = breakdown_php_version_string(part);
           if (version_string_info.length > 0) {
             var source = version_string_info[0];

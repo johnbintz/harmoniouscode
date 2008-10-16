@@ -17,8 +17,8 @@ class JavaScriptTarget {
     code_parser = new CodeParser();
     code_parser.load_processors_from_resources();
 
-    show_only_modules = new Hash<Bool>();
-    ignored_modules = new Hash<Bool>();
+    show_only_modules        = new Hash<Bool>();
+    ignored_modules          = new Hash<Bool>();
     manually_ignored_modules = new Hash<Bool>();
 
     #if js
@@ -78,16 +78,9 @@ class JavaScriptTarget {
   }
 
   #if js
-    static public function change_result_and_redraw(result_checkbox : Dynamic) {
-      var index_id_search = ~/^result-enabled-([0-9]+)$/;
-      if (index_id_search.match(result_checkbox.id)) {
-        var index_id = Std.parseInt(index_id_search.matched(1));
-        if (change_result(index_id, !result_checkbox.checked)) {
-          display_version_information();
-        }
-      }
-    }
-
+    /**
+      Display code version information.
+    **/
     static public function display_version_information() {
       var version_info = new CodeVersionInformation(current_results, ignored_modules);
 
@@ -97,6 +90,7 @@ class JavaScriptTarget {
 
       output += "<form action=\"\" onsubmit=\"return false\">";
 
+      // module list
       var all_modules_hash = new Hash<Bool>();
 
       for (module in minimum.keys()) { all_modules_hash.set(module, true); }
@@ -163,6 +157,7 @@ class JavaScriptTarget {
 
       output += "</table>";
 
+      // maximum version info
       var maximum = version_info.final_versions.get("maximum");
       var printed_message = false;
 
@@ -180,6 +175,7 @@ class JavaScriptTarget {
         output += "<p><strong>This code may not run!</strong></p>";
       }
 
+      // tokens list
       output += "<table cellspacing=\"0\" id=\"results-list\">";
 
       output += "<tr><th>Token</th><th>Ignore?</th>";
@@ -258,6 +254,7 @@ class JavaScriptTarget {
 
       output += "</form>";
 
+      // update the how-to-ignore information
       var permanent_ignore_div = js.Lib.document.getElementById("permanent-ignore");
 
       if ((ignored_modules_array.length > 0) || (ignored_tokens.length > 0)) {
@@ -286,6 +283,9 @@ class JavaScriptTarget {
       js.Lib.document.getElementById('output').innerHTML = output;
     }
 
+    /**
+      Analyze the provided code and display the results.
+    **/
     static public function do_analysis(textarea) {
       show_only_modules = new Hash<Bool>();
 
@@ -305,11 +305,30 @@ class JavaScriptTarget {
       }, 100);
     }
 
+    /**
+      Toggle a token's visibility and redraw the page.
+    **/
+    static public function change_result_and_redraw(result_checkbox : Dynamic) {
+      var index_id_search = ~/^result-enabled-([0-9]+)$/;
+      if (index_id_search.match(result_checkbox.id)) {
+        var index_id = Std.parseInt(index_id_search.matched(1));
+        if (change_result(index_id, !result_checkbox.checked)) {
+          display_version_information();
+        }
+      }
+    }
+
+    /**
+      Toggle a module's visibiity and redraw the page.
+    **/
     static public function toggle_module_and_redraw(module : String) {
       JavaScriptTarget.toggle_module(module);
       JavaScriptTarget.display_version_information();
     }
 
+    /**
+      Toggle a module's enabled/disabed status and redraw the page.
+    **/
     static public function toggle_ignore_module_and_redraw(module : String) {
       JavaScriptTarget.toggle_ignore_module(module);
       JavaScriptTarget.display_version_information();

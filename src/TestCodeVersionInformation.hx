@@ -28,6 +28,7 @@ class TestCodeVersionInformation extends haxe.unit.TestCase {
   **/
   function test_breakdown_version_string() {
     assertEquals("[PHP, 4]", CodeVersionInformation.breakdown_php_version_string("PHP 4").toString());
+    assertEquals("[PHP, 4]", CodeVersionInformation.breakdown_php_version_string(" PHP 4").toString());
     assertEquals("[PHP, 5.2.0]", CodeVersionInformation.breakdown_php_version_string("PHP 5 &gt;= 5.2.0").toString());
     assertEquals("[xmlwriter, 2.0.4]", CodeVersionInformation.breakdown_php_version_string("xmlwriter 2.0.4").toString());
 
