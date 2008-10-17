@@ -1,3 +1,6 @@
+/**
+  Process the PHP documentation's function definition file.
+**/
 class FunctionTokenProcessor extends TokenProcessor {
   public static var source_path : String = "../data/phpdoc_function_versions.xml";
   override public function get_default_token_type() { return FunctionToken; }

@@ -11,6 +11,7 @@ class MyTests {
     r.add(new TestCodeVersionInformation());
     r.add(new TestResult());
     r.add(new TestJavaScriptTarget());
+    r.add(new TestCommandLineInterface());
     r.run();
   }
 }
