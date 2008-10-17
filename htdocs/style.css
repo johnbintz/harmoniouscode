@@ -1,5 +1,7 @@
 body {
-  background-color: #def
+  background-color: #def;
+  margin: 0;
+  padding: 0
 }
 
 body, td, div, li, p, span {
@@ -8,7 +10,14 @@ body, td, div, li, p, span {
 }
 
 h1, h2 {
-  text-align: center
+  text-align: center;
+  margin: 0;
+}
+
+div#top {
+  background-color: #bbd;
+  border-bottom: solid #335 2px;
+  height: 35px
 }
 
 div#form-holder {
@@ -97,4 +106,8 @@ div#processing, div#code-announcement {
 div#code-announcement {
   border-bottom: solid #555 1px;
   margin-bottom: 5px
+}
+
+div#output {
+  padding: 10px;
 }
