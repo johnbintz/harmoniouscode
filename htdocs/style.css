@@ -7,7 +7,7 @@ body, td, div, li, p, span {
   font-size: 12px;
 }
 
-h1 {
+h1, h2 {
   text-align: center
 }
 
@@ -71,6 +71,7 @@ th.is-filtering {
 textarea#source {
   width: 750px;
   height: 250px;
+  background: white url(php_goes_here-crushed.png) center center no-repeat;
 }
 
 div#footer {

@@ -27,6 +27,15 @@ class JavaScriptTarget {
 
       loading_div.style.display = "none";
       form_div.style.display = "";
+
+      var source = js.Lib.document.getElementById("source");
+      untyped {
+        if (source.value != "") {
+          source.style.backgroundImage = "none";
+        } else {
+            source.onclick = function(e) { source.style.backgroundImage = "none"; }
+        }
+      }
     #end
   }
 

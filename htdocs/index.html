@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Harmonious Code: Will my PHP code and Web hosting work together?</title>
+    <title>Harmonious Code: The PHP Static Code Version Checker</title>
     <meta name="keywords" content="php, static code analysis, web hosting, functions, constants, language features" />
     <link rel="stylesheet" href="style.css" type="text/css" />
     <!--use thest HTML comments to dynamically insert your own content
@@ -14,6 +14,7 @@
   </head>
   <body>
     <h1>Harmonious Code</h1>
+    <h2>The PHP Static Code Version Checker</h2>
     <!--page_header-->
     <div id="loading">
       Loading...
@@ -22,7 +23,7 @@
       <div id="form-holder">
         <form action="" method="post" onsubmit="return false;">
           <textarea name="source" id="source"></textarea><br />
-          <input id="analyze-code-button" type="button" value="Analyze Code" onclick="JavaScriptTarget.do_analysis(this.form.elements.source)" />
+          <input id="analyze-code-button" type="button" value="Analyze Code (this may take a while)" onclick="JavaScriptTarget.do_analysis(this.form.elements.source)" />
         </form>
       </div>
       <div id="processing"></div>
