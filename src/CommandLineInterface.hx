@@ -31,8 +31,9 @@ class CommandLineInterface {
 
         var results = parser.parse(code);
         var ignored_modules = parser.ignored_modules;
+        var ignored_tokens_in_modules = parser.ignored_tokens_in_modules;
 
-        var version_info = new CodeVersionInformation(results, ignored_modules);
+        var version_info = new CodeVersionInformation(results, ignored_modules, ignored_tokens_in_modules);
 
         neko.Lib.print("Your code in " + arguments[0] + " requires the following minimum PHP & PECL module versions:\n");
 

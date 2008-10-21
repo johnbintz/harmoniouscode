@@ -11,15 +11,17 @@ class JavaScriptTarget {
   static public var current_results : Array<Result>;
   static public var show_only_modules : Hash<Bool>;
   static public var ignored_modules : Hash<Bool>;
+  static public var ignored_tokens_in_modules : Hash<Hash<Bool>>;
   static public var manually_ignored_modules : Hash<Bool>;
 
   static public function main() {
     code_parser = new CodeParser();
     code_parser.load_processors_from_resources();
 
-    show_only_modules        = new Hash<Bool>();
-    ignored_modules          = new Hash<Bool>();
-    manually_ignored_modules = new Hash<Bool>();
+    show_only_modules         = new Hash<Bool>();
+    ignored_modules           = new Hash<Bool>();
+    ignored_tokens_in_modules = new Hash<Hash<Bool>>();
+    manually_ignored_modules  = new Hash<Bool>();
 
     #if js
       var loading_div = js.Lib.document.getElementById("loading");
@@ -45,6 +47,7 @@ class JavaScriptTarget {
   static public function get_results(s : String) {
     current_results = code_parser.parse(s);
     ignored_modules = code_parser.ignored_modules;
+    ignored_tokens_in_modules = code_parser.ignored_tokens_in_modules;
     manually_ignored_modules = new Hash<Bool>();
   }
 
@@ -91,7 +94,7 @@ class JavaScriptTarget {
       Display code version information.
     **/
     static public function display_version_information() {
-      var version_info = new CodeVersionInformation(current_results, ignored_modules);
+      var version_info = new CodeVersionInformation(current_results, ignored_modules, ignored_tokens_in_modules);
 
       var output = "<div id=\"code-announcement\">Your code requires the following minimum PHP & PECL module versions:</div>";
 
