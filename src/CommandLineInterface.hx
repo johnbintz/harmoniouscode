@@ -30,6 +30,12 @@ class CommandLineInterface {
         parser.load_processors_from_resources();
 
         var results = parser.parse(code);
+
+        if (results.length == 0) {
+          neko.Lib.print("Your code didn't have any tokens in it!");
+          neko.Sys.exit(0);
+        }
+
         var ignored_modules = parser.ignored_modules;
         var ignored_tokens_in_modules = parser.ignored_tokens_in_modules;
 

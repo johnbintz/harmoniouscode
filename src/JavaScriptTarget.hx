@@ -94,177 +94,183 @@ class JavaScriptTarget {
       Display code version information.
     **/
     static public function display_version_information() {
-      var version_info = new CodeVersionInformation(current_results, ignored_modules, ignored_tokens_in_modules);
-
-      var output = "<div id=\"code-announcement\">Your code requires the following minimum PHP & PECL module versions:</div>";
-
-      var minimum = version_info.final_versions.get("minimum");
-
-      output += "<form action=\"\" onsubmit=\"return false\">";
-
-      // module list
-      var all_modules_hash = new Hash<Bool>();
-
-      for (module in minimum.keys()) { all_modules_hash.set(module, true); }
-      for (module in ignored_modules.keys()) { all_modules_hash.set(module, true); }
-      for (module in manually_ignored_modules.keys()) { all_modules_hash.set(module, true); }
-
-      var all_modules = new Array<String>();
-
-      for (module in all_modules_hash.keys()) { all_modules.push(module); }
-
-      all_modules.sort(CodeVersionInformation.module_name_sorter);
-
+      var output : String;
       var ignored_tokens        = new Array<String>();
       var ignored_modules_array = new Array<String>();
-      for (module in manually_ignored_modules.keys()) {
-        if (manually_ignored_modules.get(module) == true) {
-          ignored_modules_array.push("@" + module);
-        }
-      }
 
-      output += "<table cellspacing=\"0\" id=\"modules\">";
-      output += "<tr><th>Module</th><th>Ignore?</th><th>Version</th></tr>";
+      if (current_results.length == 0) {
+        output = "<div id=\"code-announcement\">Your code doesn't have any tokens in it!</div>";
+      } else {
+        var version_info = new CodeVersionInformation(current_results, ignored_modules, ignored_tokens_in_modules);
 
-      for (module in all_modules) {
-        var is_ignored = false;
-        var is_ignored_in_source = false;
-        var show_checkbox = true;
-        var is_checked = false;
+        output = "<div id=\"code-announcement\">Your code requires the following minimum PHP & PECL module versions:</div>";
 
-        if (ignored_modules.exists(module) == true) {
-          is_ignored = true;
-          is_ignored_in_source = true;
-          show_checkbox = false;
-        }
-        if (manually_ignored_modules.get(module) == true) {
-          is_ignored = true;
-          is_checked = true;
-        }
+        var minimum = version_info.final_versions.get("minimum");
 
-        output += "<tr class=\"" + (is_ignored ? "disabled" : "enabled") + "\"><td class=\"module\">" + module + "</td>";
+        output += "<form action=\"\" onsubmit=\"return false\">";
 
-        if (show_checkbox && (module.toLowerCase() != "php")) {
-          output += "<td align=\"center\"><input type=\"checkbox\" name=\"ignore-module-" + module + "\" id=\"ignore-module-" + module + "\" onclick=\"JavaScriptTarget.toggle_ignore_module_and_redraw('" + module + "')\" " + (is_checked ? " checked" : "") + "/></td>";
-        } else {
-          output += "<td>&nbsp;</td>";
-        }
+        // module list
+        var all_modules_hash = new Hash<Bool>();
 
-        if (is_ignored) {
-          if (is_ignored_in_source) {
-            output += "<td>(ignored in source)</td>";
-          } else {
-            output += "<td>(ignored)</td>";
+        for (module in minimum.keys()) { all_modules_hash.set(module, true); }
+        for (module in ignored_modules.keys()) { all_modules_hash.set(module, true); }
+        for (module in manually_ignored_modules.keys()) { all_modules_hash.set(module, true); }
+
+        var all_modules = new Array<String>();
+
+        for (module in all_modules_hash.keys()) { all_modules.push(module); }
+
+        all_modules.sort(CodeVersionInformation.module_name_sorter);
+
+        for (module in manually_ignored_modules.keys()) {
+          if (manually_ignored_modules.get(module) == true) {
+            ignored_modules_array.push("@" + module);
           }
-        } else {
-          if (minimum.exists(module)) {
-            output += "<td>" + minimum.get(module) + "</td>";
+        }
+
+        output += "<table cellspacing=\"0\" id=\"modules\">";
+        output += "<tr><th>Module</th><th>Ignore?</th><th>Version</th></tr>";
+
+        for (module in all_modules) {
+          var is_ignored = false;
+          var is_ignored_in_source = false;
+          var show_checkbox = true;
+          var is_checked = false;
+
+          if (ignored_modules.exists(module) == true) {
+            is_ignored = true;
+            is_ignored_in_source = true;
+            show_checkbox = false;
+          }
+          if (manually_ignored_modules.get(module) == true) {
+            is_ignored = true;
+            is_checked = true;
+          }
+
+          output += "<tr class=\"" + (is_ignored ? "disabled" : "enabled") + "\"><td class=\"module\">" + module + "</td>";
+
+          if (show_checkbox && (module.toLowerCase() != "php")) {
+            output += "<td align=\"center\"><input type=\"checkbox\" name=\"ignore-module-" + module + "\" id=\"ignore-module-" + module + "\" onclick=\"JavaScriptTarget.toggle_ignore_module_and_redraw('" + module + "')\" " + (is_checked ? " checked" : "") + "/></td>";
           } else {
             output += "<td>&nbsp;</td>";
           }
-        }
 
-        output += "</tr>";
-      }
-
-      output += "</table>";
-
-      // maximum version info
-      var maximum = version_info.final_versions.get("maximum");
-      var printed_message = false;
-
-      for (module in maximum.keys()) {
-        if (!printed_message) {
-          output += "Your code also can't use PHP or PECL modules newer than:<ul>";
-          printed_message = true;
-        }
-        output += ("<li>" + module + ": " + maximum.get(module) + "</li>");
-      }
-
-      if (printed_message) { output += "</ul>"; }
-
-      if (!version_info.is_valid()) {
-        output += "<p><strong>This code may not run!</strong></p>";
-      }
-
-      // tokens list
-      output += "<table cellspacing=\"0\" id=\"results-list\">";
-
-      output += "<tr><th>Token</th><th>Ignore?</th>";
-
-      for (module in version_info.all_modules) {
-        var classes = ["filter"];
-        if (show_only_modules.exists(module)) {
-          if (show_only_modules.get(module)) {
-            classes.push("is-filtering");
-          }
-        }
-
-        if (manually_ignored_modules.get(module) != true) {
-          output += "<th title=\"click to toggle filter\" class=\"" + classes.join(" ") + "\" onclick=\"JavaScriptTarget.toggle_module_and_redraw('" + module + "')\">" + module + "</th>";
-        }
-      }
-
-      output += "</tr>";
-
-      var id_index = 0;
-      for (result in current_results) {
-        var ok_to_show = true;
-        var modules_check_out = true;
-        var any_visible_modules = false;
-
-        if (!result.is_enabled) { ignored_tokens.push(result.token); }
-
-        var max_versions = CodeVersionInformation.split_version_string(result.version);
-
-        for (module in show_only_modules.keys()) {
-          if (show_only_modules.get(module)) {
-            ok_to_show = false;
-            if (!max_versions.exists(module)) { modules_check_out = false; }
-          }
-        }
-
-        for (module in max_versions.keys()) {
-          if (ignored_modules.exists(module)) {
-            if (!ignored_modules.get(module)) { any_visible_modules = true; }
+          if (is_ignored) {
+            if (is_ignored_in_source) {
+              output += "<td>(ignored in source)</td>";
+            } else {
+              output += "<td>(ignored)</td>";
+            }
           } else {
-            any_visible_modules = true;
-          }
-        }
-
-        if (modules_check_out) { ok_to_show = true; }
-        if (!any_visible_modules) { ok_to_show = false; }
-
-        if (ok_to_show) {
-          var result_class = (result.is_enabled ? "enabled" : "disabled");
-          var result_id    = "result-" + id_index;
-          var enabled_id   = "result-enabled-" + id_index;
-          output += "<tr id=\"" + result_id + "\" class=\"" + result_class + "\">";
-
-          output += "<td class=\"token\">" + result.token + "</td>";
-
-          output += "<td align=\"center\"><input onclick=\"JavaScriptTarget.change_result_and_redraw(this)\" type=\"checkbox\" name=\"" + enabled_id + "\" id=\"" + enabled_id + "\""
-          + ((!result.is_enabled) ? " checked" : "") + " /></td>";
-
-          for (module in version_info.all_modules) {
-            if (manually_ignored_modules.get(module) != true) {
-              output += "<td>";
-              if (max_versions.exists(module)) {
-                output += max_versions.get(module);
-              } else {
-                output += "&nbsp;";
-              }
-              output += "</td>";
+            if (minimum.exists(module)) {
+              output += "<td>" + minimum.get(module) + "</td>";
+            } else {
+              output += "<td>&nbsp;</td>";
             }
           }
 
           output += "</tr>";
         }
-        id_index++;
-      }
-      output += "</table>";
 
-      output += "</form>";
+        output += "</table>";
+
+        // maximum version info
+        var maximum = version_info.final_versions.get("maximum");
+        var printed_message = false;
+
+        for (module in maximum.keys()) {
+          if (!printed_message) {
+            output += "Your code also can't use PHP or PECL modules newer than:<ul>";
+            printed_message = true;
+          }
+          output += ("<li>" + module + ": " + maximum.get(module) + "</li>");
+        }
+
+        if (printed_message) { output += "</ul>"; }
+
+        if (!version_info.is_valid()) {
+          output += "<p><strong>This code may not run!</strong></p>";
+        }
+
+        // tokens list
+        output += "<table cellspacing=\"0\" id=\"results-list\">";
+
+        output += "<tr><th>Token</th><th>Ignore?</th>";
+
+        for (module in version_info.all_modules) {
+          var classes = ["filter"];
+          if (show_only_modules.exists(module)) {
+            if (show_only_modules.get(module)) {
+              classes.push("is-filtering");
+            }
+          }
+
+          if (manually_ignored_modules.get(module) != true) {
+            output += "<th title=\"click to toggle filter\" class=\"" + classes.join(" ") + "\" onclick=\"JavaScriptTarget.toggle_module_and_redraw('" + module + "')\">" + module + "</th>";
+          }
+        }
+
+        output += "</tr>";
+
+        var id_index = 0;
+        for (result in current_results) {
+          var ok_to_show = true;
+          var modules_check_out = true;
+          var any_visible_modules = false;
+
+          if (!result.is_enabled) { ignored_tokens.push(result.token); }
+
+          var max_versions = CodeVersionInformation.split_version_string(result.version);
+
+          for (module in show_only_modules.keys()) {
+            if (show_only_modules.get(module)) {
+              ok_to_show = false;
+              if (!max_versions.exists(module)) { modules_check_out = false; }
+            }
+          }
+
+          for (module in max_versions.keys()) {
+            if (ignored_modules.exists(module)) {
+              if (!ignored_modules.get(module)) { any_visible_modules = true; }
+            } else {
+              any_visible_modules = true;
+            }
+          }
+
+          if (modules_check_out) { ok_to_show = true; }
+          if (!any_visible_modules) { ok_to_show = false; }
+
+          if (ok_to_show) {
+            var result_class = (result.is_enabled ? "enabled" : "disabled");
+            var result_id    = "result-" + id_index;
+            var enabled_id   = "result-enabled-" + id_index;
+            output += "<tr id=\"" + result_id + "\" class=\"" + result_class + "\">";
+
+            output += "<td class=\"token\">" + result.token + "</td>";
+
+            output += "<td align=\"center\"><input onclick=\"JavaScriptTarget.change_result_and_redraw(this)\" type=\"checkbox\" name=\"" + enabled_id + "\" id=\"" + enabled_id + "\""
+            + ((!result.is_enabled) ? " checked" : "") + " /></td>";
+
+            for (module in version_info.all_modules) {
+              if (manually_ignored_modules.get(module) != true) {
+                output += "<td>";
+                if (max_versions.exists(module)) {
+                  output += max_versions.get(module);
+                } else {
+                  output += "&nbsp;";
+                }
+                output += "</td>";
+              }
+            }
+
+            output += "</tr>";
+          }
+          id_index++;
+        }
+        output += "</table>";
+
+        output += "</form>";
+      }
 
       // update the how-to-ignore information
       var permanent_ignore_div = js.Lib.document.getElementById("permanent-ignore");
