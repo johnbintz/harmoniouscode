@@ -124,7 +124,7 @@ class CodeVersionInformation {
     Create a new CodeVersionInformation object based on the provided
     Result set and, optionally, while ignoring the provided modules.
   **/
-  public function new(results : Array<Result>, ?ignored_modules : Hash<Bool>) {
+  public function new(results : Array<Result>, ?ignored_modules : Hash<Bool>, ?ignored_tokens_in_modules : Hash<Hash<Bool>>) {
     var start_minimum_versions = new Hash<Array<String>>();
     var start_maximum_versions = new Hash<Array<String>>();
 
@@ -141,6 +141,14 @@ class CodeVersionInformation {
             var ok_to_use = true;
             if (ignored_modules != null) {
               ok_to_use = !ignored_modules.exists(source);
+            }
+            if (ok_to_use) {
+              if (ignored_tokens_in_modules != null) {
+                if (ignored_tokens_in_modules.exists(result.token)) {
+                  var token_info = ignored_tokens_in_modules.get(result.token);
+                  ok_to_use = !token_info.exists(source);
+                }
+              }
             }
 
             if (ok_to_use) {

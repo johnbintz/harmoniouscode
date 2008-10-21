@@ -47,6 +47,12 @@ the following in your code:
 
   //harmonious @maxdb
 
+* To ignore the version information for a particular module for a
+  particular token (ex: the rename function of the zip module), place
+  at the top of the file the following:
+
+  //harmonious @zip:rename
+
 No build instructions for Windows yet, but Cygwin + haXe for Windows should
 be able to perform the build.
 

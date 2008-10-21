@@ -8,12 +8,14 @@ import ConstantTokenProcessor;
 class CodeParser {
   public var token_processors(get_token_processors, null) : Hash<TokenProcessor>;
   public var ignored_modules(get_ignored_modules, null) : Hash<Bool>;
+  public var ignored_tokens_in_modules(get_ignored_tokens_in_modules, null) : Hash<Hash<Bool>>;
 
   public static var processor_types = [ "FunctionTokenProcessor", "ConstantTokenProcessor" ];
 
   public function new() {
     this.token_processors = new Hash<TokenProcessor>();
     this.ignored_modules  = new Hash<Bool>();
+    this.ignored_tokens_in_modules = new Hash<Hash<Bool>>();
   }
 
   #if neko
@@ -38,6 +40,7 @@ class CodeParser {
 
   public function get_token_processors() { return this.token_processors; }
   public function get_ignored_modules() { return this.ignored_modules; }
+  public function get_ignored_tokens_in_modules() { return this.ignored_tokens_in_modules; }
 
   /**
     Flatten a list of hashes into a single hash.
@@ -143,7 +146,21 @@ class CodeParser {
                   for (token in new_tokens_to_ignore) {
                     if (token.charAt(0) == "@") {
                       if (token.toLowerCase() != "@php") {
-                        this.ignored_modules.set(token.substr(1), true);
+                        if (token.indexOf(":") != -1) {
+                          var parts = token.split(":");
+                          var module = parts[0].substr(1);
+                          var token = parts[1];
+
+                          if (!this.ignored_tokens_in_modules.exists(module)) {
+                            this.ignored_tokens_in_modules.set(token, new Hash<Bool>());
+                          }
+
+                          var token_info = this.ignored_tokens_in_modules.get(token);
+                          token_info.set(module, true);
+                          this.ignored_tokens_in_modules.set(token, token_info);
+                        } else {
+                          this.ignored_modules.set(token.substr(1), true);
+                        }
                       }
                     } else {
                       tokens_to_ignore_hash.set(token, true);

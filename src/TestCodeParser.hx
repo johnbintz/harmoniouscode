@@ -8,7 +8,8 @@ class TestCodeParser extends haxe.unit.TestCase {
     [ "//harmonious json_encode\narray_shift() json_encode()\n//harmonious_end\njson_encode()", "2", "{minimum => {PHP => 5.2.0, json => 1.2.0}, maximum => {}}" ],
     [ "//harmonious @json\narray_shift() json_encode()\n//harmonious_end\njson_encode()", "2", "{minimum => {PHP => 5.2.0}, maximum => {}}" ],
     [ "//harmonious @PHP\narray_shift()", "1", "{minimum => {PHP => 4}, maximum => {}}" ],
-    [ "PATHINFO_BASENAME", "1", "{minimum => {PHP => 4}, maximum => {}}" ]
+    [ "PATHINFO_BASENAME", "1", "{minimum => {PHP => 4}, maximum => {}}" ],
+    [ "//harmonious @zip:rename\nrename()", "1", "{minimum => {PHP => 4}, maximum => {}}" ]
   ];
 
   #if neko
@@ -26,8 +27,9 @@ class TestCodeParser extends haxe.unit.TestCase {
       for (code in test_code) {
         var result = p.parse(code[0]);
         var ignored_modules = p.ignored_modules;
+        var ignored_tokens_in_modules = p.ignored_tokens_in_modules;
         assertEquals(Std.parseInt(code[1]), result.length);
-        var code_version_info = new CodeVersionInformation(result, ignored_modules);
+        var code_version_info = new CodeVersionInformation(result, ignored_modules, ignored_tokens_in_modules);
         assertEquals(code[2], code_version_info.final_versions.toString());
       }
     }
