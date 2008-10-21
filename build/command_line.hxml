@@ -1,3 +1,4 @@
 -main CommandLineInterface
 -neko ../neko/codeparser.n
 -cp ../src
+-resource ../data/all_tokens.hxd

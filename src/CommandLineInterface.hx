@@ -27,7 +27,7 @@ class CommandLineInterface {
         var code = neko.io.File.getContent(filepath);
 
         var parser = new CodeParser();
-        parser.load_all_processors_from_disk();
+        parser.load_processors_from_resources();
 
         var results = parser.parse(code);
 
