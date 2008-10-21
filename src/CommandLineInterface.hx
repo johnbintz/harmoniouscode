@@ -30,8 +30,9 @@ class CommandLineInterface {
         parser.load_processors_from_resources();
 
         var results = parser.parse(code);
+        var ignored_modules = parser.ignored_modules;
 
-        var version_info = new CodeVersionInformation(results);
+        var version_info = new CodeVersionInformation(results, ignored_modules);
 
         neko.Lib.print("Your code in " + arguments[0] + " requires the following minimum PHP & PECL module versions:\n");
 
