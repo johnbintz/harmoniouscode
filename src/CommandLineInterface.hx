@@ -32,7 +32,7 @@ class CommandLineInterface {
         var results = parser.parse(code);
 
         if (results.length == 0) {
-          neko.Lib.print("Your code didn't have any tokens in it!");
+          neko.Lib.print("Your code didn't have any tokens in it!\n");
           neko.Sys.exit(0);
         }
 
@@ -41,7 +41,7 @@ class CommandLineInterface {
 
         var version_info = new CodeVersionInformation(results, ignored_modules, ignored_tokens_in_modules);
 
-        neko.Lib.print("Your code in " + arguments[0] + " requires the following minimum PHP & PECL module versions:\n");
+        neko.Lib.print("Your code in " + filepath + " requires the following minimum PHP & PECL module versions:\n");
 
         var minimum = version_info.final_versions.get("minimum");
 
